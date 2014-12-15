@@ -8,6 +8,10 @@ be a list of errors. If the caller knows this, they can unwrap the
 list and access the errors. If the caller doesn't know, the error
 formats to a nice human-readable format.
 
+`go-multierror` implements the
+[errwrap](https://github.com/hashicorp/errwrap) interface so that it can
+be used with that library, as well.
+
 ## Installation and Docs
 
 Install using `go get github.com/hashicorp/go-multierror`.
