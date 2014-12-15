@@ -54,28 +54,3 @@ func TestErrorWrappedErrors(t *testing.T) {
 		t.Fatalf("bad: %s", multi.WrappedErrors())
 	}
 }
-
-func TestErrorAppend_Error(t *testing.T) {
-	original := &Error{
-		Errors: []error{errors.New("foo")},
-	}
-
-	result := ErrorAppend(original, errors.New("bar"))
-	if len(result.Errors) != 2 {
-		t.Fatalf("wrong len: %d", len(result.Errors))
-	}
-
-	original = &Error{}
-	result = ErrorAppend(original, errors.New("bar"))
-	if len(result.Errors) != 1 {
-		t.Fatalf("wrong len: %d", len(result.Errors))
-	}
-}
-
-func TestErrorAppend_NonError(t *testing.T) {
-	original := errors.New("foo")
-	result := ErrorAppend(original, errors.New("bar"))
-	if len(result.Errors) != 2 {
-		t.Fatalf("wrong len: %d", len(result.Errors))
-	}
-}
