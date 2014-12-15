@@ -6,7 +6,7 @@ import (
 )
 
 func TestError_Impl(t *testing.T) {
-    var _ error = new(Error)
+	var _ error = new(Error)
 }
 
 func TestErrorError_custom(t *testing.T) {
@@ -15,9 +15,9 @@ func TestErrorError_custom(t *testing.T) {
 		errors.New("bar"),
 	}
 
-    fn := func(es []error) string {
-        return "foo"
-    }
+	fn := func(es []error) string {
+		return "foo"
+	}
 
 	multi := &Error{Errors: errors, ErrorFormat: fn}
 	if multi.Error() != "foo" {

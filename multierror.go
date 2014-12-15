@@ -7,17 +7,17 @@ import (
 // Error is an error type to track multiple errors. This is used to
 // accumulate errors in cases and return them as a single "error".
 type Error struct {
-	Errors []error
-    ErrorFormat ErrorFormatFunc
+	Errors      []error
+	ErrorFormat ErrorFormatFunc
 }
 
 func (e *Error) Error() string {
-    fn := e.ErrorFormat
-    if fn == nil {
-        fn = ListFormatFunc
-    }
+	fn := e.ErrorFormat
+	if fn == nil {
+		fn = ListFormatFunc
+	}
 
-    return fn(e.Errors)
+	return fn(e.Errors)
 }
 
 func (e *Error) GoString() string {

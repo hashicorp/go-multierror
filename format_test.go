@@ -1,8 +1,8 @@
 package multierror
 
 import (
-"errors"
-"testing"
+	"errors"
+	"testing"
 )
 
 func TestListFormatFunc(t *testing.T) {
@@ -16,8 +16,8 @@ func TestListFormatFunc(t *testing.T) {
 		errors.New("bar"),
 	}
 
-    actual := ListFormatFunc(errors)
-    if actual != expected {
-        t.Fatalf("bad: %#v", actual)
-    }
+	actual := ListFormatFunc(errors)
+	if actual != expected {
+		t.Fatalf("bad: %#v", actual)
+	}
 }
