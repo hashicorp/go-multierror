@@ -2,6 +2,7 @@ package multierror
 
 import (
 	"errors"
+	"reflect"
 	"testing"
 )
 
@@ -39,6 +40,18 @@ func TestErrorError_default(t *testing.T) {
 	multi := &Error{Errors: errors}
 	if multi.Error() != expected {
 		t.Fatalf("bad: %s", multi.Error())
+	}
+}
+
+func TestErrorWrappedErrors(t *testing.T) {
+	errors := []error{
+		errors.New("foo"),
+		errors.New("bar"),
+	}
+
+	multi := &Error{Errors: errors}
+	if !reflect.DeepEqual(multi.Errors, multi.WrappedErrors()) {
+		t.Fatalf("bad: %s", multi.WrappedErrors())
 	}
 }
 

@@ -24,6 +24,17 @@ func (e *Error) GoString() string {
 	return fmt.Sprintf("*%#v", *e)
 }
 
+// WrappedErrors returns the list of errors that this Error is wrapping.
+// It is an implementatin of the errwrap.Wrapper interface so that
+// multierror.Error can be used with that library.
+//
+// This method is not safe to be called concurrently and is no different
+// than accessing the Errors field directly. It is implementd only to
+// satisfy the errwrap.Wrapper interface.
+func (e *Error) WrappedErrors() []error {
+	return e.Errors
+}
+
 // ErrorAppend is a helper function that will append more errors
 // onto an Error in order to create a larger multi-error.
 //
