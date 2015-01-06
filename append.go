@@ -13,10 +13,6 @@ func Append(err error, errs ...error) *Error {
 
 	switch err := err.(type) {
 	case *Error:
-		if err == nil {
-			err = new(Error)
-		}
-
 		err.Errors = append(err.Errors, errs...)
 		return err
 	default:
