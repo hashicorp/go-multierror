@@ -20,6 +20,13 @@ func TestAppend_Error(t *testing.T) {
 	if len(result.Errors) != 1 {
 		t.Fatalf("wrong len: %d", len(result.Errors))
 	}
+
+	// Test when a typed nil is passed
+	var e *Error
+	result = Append(e, errors.New("baz"))
+	if len(result.Errors) != 1 {
+		t.Fatalf("wrong len: %d", len(result.Errors))
+	}
 }
 
 func TestAppend_NonError(t *testing.T) {
