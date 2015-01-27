@@ -21,9 +21,7 @@ func Append(err error, errs ...error) *Error {
 		if err != nil {
 			newErrs = append(newErrs, err)
 		}
-		for _, err := range errs {
-			newErrs = append(newErrs, err)
-		}
+		newErrs = append(newErrs, errs...)
 
 		return &Error{
 			Errors: newErrs,
