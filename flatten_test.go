@@ -3,6 +3,7 @@ package multierror
 import (
 	"errors"
 	"fmt"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -35,5 +36,13 @@ func TestFlatten(t *testing.T) {
 
 	if expected != actual {
 		t.Fatalf("expected: %s, got: %s", expected, actual)
+	}
+}
+
+func TestFlatten_nonError(t *testing.T) {
+	err := errors.New("foo")
+	actual := Flatten(err)
+	if !reflect.DeepEqual(actual, err) {
+		t.Fatalf("bad: %#v", actual)
 	}
 }
