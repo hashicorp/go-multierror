@@ -1,5 +1,7 @@
 package multierror
 
+// Flatten flattens the given error, merging any *Errors together into 
+// a single *Error.
 func Flatten(err error) error {
 	flatErr := new(Error)
 	flatten(err, flatErr)
