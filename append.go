@@ -32,8 +32,6 @@ func Append(err error, errs ...error) *Error {
 		}
 		newErrs = append(newErrs, errs...)
 
-		return &Error{
-			Errors: newErrs,
-		}
+		return Append(&Error{}, newErrs...)
 	}
 }

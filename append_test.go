@@ -46,9 +46,18 @@ func TestAppend_NilError(t *testing.T) {
 		t.Fatalf("wrong len: %d", len(result.Errors))
 	}
 }
+
 func TestAppend_NonError(t *testing.T) {
 	original := errors.New("foo")
 	result := Append(original, errors.New("bar"))
+	if len(result.Errors) != 2 {
+		t.Fatalf("wrong len: %d", len(result.Errors))
+	}
+}
+
+func TestAppend_NonError_Error(t *testing.T) {
+	original := errors.New("foo")
+	result := Append(original, Append(nil, errors.New("bar")))
 	if len(result.Errors) != 2 {
 		t.Fatalf("wrong len: %d", len(result.Errors))
 	}
