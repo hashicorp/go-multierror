@@ -27,6 +27,16 @@ func TestAppend_Error(t *testing.T) {
 	if len(result.Errors) != 1 {
 		t.Fatalf("wrong len: %d", len(result.Errors))
 	}
+
+	// Test flattening
+	original = &Error{
+		Errors: []error{errors.New("foo")},
+	}
+
+	result = Append(original, Append(nil, errors.New("foo"), errors.New("bar")))
+	if len(result.Errors) != 3 {
+		t.Fatalf("wrong len: %d", len(result.Errors))
+	}
 }
 
 func TestAppend_NilError(t *testing.T) {

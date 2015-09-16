@@ -14,7 +14,16 @@ func Append(err error, errs ...error) *Error {
 			err = new(Error)
 		}
 
-		err.Errors = append(err.Errors, errs...)
+		// Go through each error and flatten
+		for _, e := range errs {
+			switch e := e.(type) {
+			case *Error:
+				err.Errors = append(err.Errors, e.Errors...)
+			default:
+				err.Errors = append(err.Errors, e)
+			}
+		}
+
 		return err
 	default:
 		newErrs := make([]error, 0, len(errs)+1)
