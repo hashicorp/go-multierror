@@ -7,8 +7,8 @@ import (
 // Error is an error type to track multiple errors. This is used to
 // accumulate errors in cases and return them as a single "error".
 type Error struct {
-	Errors      []error
-	ErrorFormat ErrorFormatFunc
+	Errors      []error         `json:"errors"`
+	ErrorFormat ErrorFormatFunc `json:"-"`
 }
 
 func (e *Error) Error() string {
