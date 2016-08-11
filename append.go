@@ -1,5 +1,38 @@
 package multierror
 
+// removeNils preserves the non-nil elements
+// of a slice. This is a destructive operation
+// the contents of the original slice are modified.
+func removeNils(errs []error) []error {
+	view := errs[:0]
+	for _, err := range errs {
+		if err != nil {
+			view = append(view, err)
+		}
+	}
+	return view
+}
+
+// AppendNonNil is a helper function that will append more errors
+// onto an Error in order to create a larger multi-error.
+//
+// If err is not a multierror.Error, then it will be turned into
+// one. If any of the errs are multierr.Error, they will be flattened
+// one level into err.
+//
+// nil values in errs are filtered out. If the err is nil and
+// the length of filtered errs is zero then the function returns nil.
+func AppendNonNil(err error, errs ...error) *Error {
+
+	errs = removeNils(errs)
+	// Preserve nil value when no errors have occurred
+	if err == nil && len(errs) == 0 {
+		return nil
+	}
+
+	return Append(err, errs...)
+}
+
 // Append is a helper function that will append more errors
 // onto an Error in order to create a larger multi-error.
 //
