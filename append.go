@@ -26,7 +26,7 @@ func removeNils(errs []error) []error {
 //
 // nil values in errs are filtered out. If the err is nil and
 // the length of filtered errs is zero then the function returns nil.
-func AppendNonNil(err error, errs ...error) *Error {
+func AppendNonNil(err error, errs ...error) error {
 
 	errs = removeNils(errs)
 	// Preserve nil value when no errors have occurred
