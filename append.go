@@ -1,12 +1,16 @@
 package multierror
 
+import (
+	"reflect"
+)
+
 // removeNils preserves the non-nil elements
 // of a slice. This is a destructive operation
 // the contents of the original slice are modified.
 func removeNils(errs []error) []error {
 	view := errs[:0]
 	for _, err := range errs {
-		if err != nil {
+		if err != nil && !reflect.ValueOf(err).IsNil() {
 			view = append(view, err)
 		}
 	}
