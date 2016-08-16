@@ -29,9 +29,9 @@ func removeNils(errs []error) []error {
 func AppendNonNil(err error, errs ...error) error {
 
 	errs = removeNils(errs)
-	// Preserve nil value when no errors have occurred
-	if err == nil && len(errs) == 0 {
-		return nil
+	// Preserve input value when no errors have occurred
+	if len(errs) == 0 {
+		return err
 	}
 
 	return Append(err, errs...)

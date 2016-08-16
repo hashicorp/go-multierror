@@ -66,9 +66,14 @@ func TestAppend_NilNil(t *testing.T) {
 func TestAppendNonNil(t *testing.T) {
 	var err1 error
 	var err2 *Error
-	result := AppendNonNil(err1, err2)
+	result := AppendNonNil(err1, err2, nil, nil)
 	if result != nil {
 		t.Fatalf("non-nil errors: %s", result.Error())
+	}
+	err1 = errors.New("foo")
+	result = AppendNonNil(err1, err2, nil, nil)
+	if result != err1 {
+		t.Fatalf("input error modified: %s", result.Error())
 	}
 }
 
