@@ -5,6 +5,10 @@ import (
 	"testing"
 )
 
+type TestError struct{}
+
+func (e TestError) Error() string { return "TestError" }
+
 func TestRemoveNils(t *testing.T) {
 	errs := []error{errors.New("foo"), nil, nil, errors.New("foo"), nil}
 	errs = removeNils(errs)
@@ -74,6 +78,15 @@ func TestAppendNonNil(t *testing.T) {
 	result = AppendNonNil(err1, err2, nil, nil)
 	if result != err1 {
 		t.Fatalf("input error modified: %s", result.Error())
+	}
+}
+
+func TestAppendNonNilStruct(t *testing.T) {
+	var err1 error
+	var err3 TestError
+	result := AppendNonNil(err1, err3, nil)
+	if result == nil {
+		t.Fatalf("TestError was not appended")
 	}
 }
 

@@ -10,7 +10,17 @@ import (
 func removeNils(errs []error) []error {
 	view := errs[:0]
 	for _, err := range errs {
-		if err != nil && !reflect.ValueOf(err).IsNil() {
+		if err == nil {
+			continue
+		}
+		add := true
+		switch reflect.TypeOf(err).Kind() {
+		case reflect.Chan, reflect.Func,
+			reflect.Interface, reflect.Map,
+			reflect.Ptr, reflect.Slice:
+			add = !reflect.ValueOf(err).IsNil()
+		}
+		if add {
 			view = append(view, err)
 		}
 	}
