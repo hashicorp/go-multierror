@@ -40,10 +40,12 @@ func AppendNonNil(err error, errs ...error) error {
 
 	errs = removeNils(errs)
 	// Preserve input value when no errors have occurred
+	// Preserve output value when only one error is produced
 	if len(errs) == 0 {
 		return err
+	} else if (err == nil) && len(errs) == 1 {
+		return errs[0]
 	}
-
 	return Append(err, errs...)
 }
 

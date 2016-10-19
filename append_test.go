@@ -79,6 +79,11 @@ func TestAppendNonNil(t *testing.T) {
 	if result != err1 {
 		t.Fatalf("input error modified: %s", result.Error())
 	}
+	err1 = errors.New("foo")
+	result = AppendNonNil(nil, err1, nil, nil)
+	if result != err1 {
+		t.Fatalf("input error modified: %s", result.Error())
+	}
 }
 
 func TestAppendNonNilStruct(t *testing.T) {
