@@ -47,6 +47,24 @@ func TestAppend_NilError(t *testing.T) {
 	}
 }
 
+func TestAppend_NilErrorArg(t *testing.T) {
+	var err error
+	var nilErr *Error
+	result := Append(err, nilErr)
+	if len(result.Errors) != 0 {
+		t.Fatalf("wrong len: %d", len(result.Errors))
+	}
+}
+
+func TestAppend_NilErrorIfaceArg(t *testing.T) {
+	var err error
+	var nilErr error
+	result := Append(err, nilErr)
+	if len(result.Errors) != 0 {
+		t.Fatalf("wrong len: %d", len(result.Errors))
+	}
+}
+
 func TestAppend_NonError(t *testing.T) {
 	original := errors.New("foo")
 	result := Append(original, errors.New("bar"))
