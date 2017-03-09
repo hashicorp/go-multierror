@@ -27,7 +27,7 @@ func removeNils(errs []error) []error {
 	return view
 }
 
-// AppendNonNil is a helper function that will append more errors
+// Append is a helper function that will append more errors
 // onto an Error in order to create a larger multi-error.
 //
 // If err is not a multierror.Error, then it will be turned into
@@ -36,7 +36,7 @@ func removeNils(errs []error) []error {
 //
 // nil values in errs are filtered out. If the err is nil and
 // the length of filtered errs is zero then the function returns nil.
-func AppendNonNil(err error, errs ...error) error {
+func Append(err error, errs ...error) error {
 
 	errs = removeNils(errs)
 	// Preserve input value when no errors have occurred
@@ -46,16 +46,16 @@ func AppendNonNil(err error, errs ...error) error {
 	} else if (err == nil) && len(errs) == 1 {
 		return errs[0]
 	}
-	return Append(err, errs...)
+	return appendInternal(err, errs...)
 }
 
-// Append is a helper function that will append more errors
+// appendInternal is a helper function that will append more errors
 // onto an Error in order to create a larger multi-error.
 //
 // If err is not a multierror.Error, then it will be turned into
 // one. If any of the errs are multierr.Error, they will be flattened
 // one level into err.
-func Append(err error, errs ...error) *Error {
+func appendInternal(err error, errs ...error) *Error {
 	switch err := err.(type) {
 	case *Error:
 		// Typed nils can reach here, so initialize if we are nil
@@ -81,6 +81,6 @@ func Append(err error, errs ...error) *Error {
 		}
 		newErrs = append(newErrs, errs...)
 
-		return Append(&Error{}, newErrs...)
+		return appendInternal(&Error{}, newErrs...)
 	}
 }
