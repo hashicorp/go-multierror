@@ -9,5 +9,5 @@
 			"revisionTime": "2014-10-28T05:47:10Z"
 		}
 	],
-	"rootPath": "github.com/hashicorp/go-multierror"
+	"rootPath": "github.com/mspiegel/go-multierror"
 }
