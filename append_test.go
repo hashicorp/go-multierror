@@ -80,3 +80,10 @@ func TestAppend_NonError_Error(t *testing.T) {
 		t.Fatalf("wrong len: %d", len(result.Errors))
 	}
 }
+
+func TestAppend_NonErrorIface(t *testing.T) {
+	result := Append("foo", errors.New("bar"))
+	if len(result.Errors) != 2 {
+		t.Fatalf("wrong len: %d", len(result.Errors))
+	}
+}
