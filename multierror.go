@@ -1,6 +1,8 @@
 package multierror
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 )
 
@@ -18,6 +20,34 @@ func (e *Error) Error() string {
 	}
 
 	return fn(e.Errors)
+}
+
+// MarshalJSON returns a valid json representation of a multierror,
+// as an object with an array of error strings.
+func (e *Error) MarshalJSON() ([]byte, error) {
+	j := map[string][]string{
+		"errors": []string{},
+	}
+	for _, err := range e.Errors {
+		j["errors"] = append(j["errors"], err.Error())
+	}
+
+	return json.Marshal(j)
+}
+
+// UnmarshalJSON parses the output of Marshal json.
+func (e *Error) UnmarshalJSON(b []byte) error {
+	j := make(map[string][]string)
+	err := json.Unmarshal(b, &j)
+	if err != nil {
+		return err
+	}
+	if _, ok := j["errors"]; ok {
+		for _, msg := range j["errors"] {
+			e.Errors = append(e.Errors, errors.New(msg))
+		}
+	}
+	return nil
 }
 
 // ErrorOrNil returns an error interface if this Error represents
