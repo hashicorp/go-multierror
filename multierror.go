@@ -20,21 +20,6 @@ func (e *Error) Error() string {
 	return fn(e.Errors)
 }
 
-// ErrorOrNil returns an error interface if this Error represents
-// a list of errors, or returns nil if the list of errors is empty. This
-// function is useful at the end of accumulation to make sure that the value
-// returned represents the existence of errors.
-func (e *Error) ErrorOrNil() error {
-	if e == nil {
-		return nil
-	}
-	if len(e.Errors) == 0 {
-		return nil
-	}
-
-	return e
-}
-
 func (e *Error) GoString() string {
 	return fmt.Sprintf("*%#v", *e)
 }
