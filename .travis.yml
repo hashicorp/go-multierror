@@ -2,8 +2,14 @@ sudo: false
 
 language: go
 
+env:
+    global: 
+        - GO111MODULE=on
+
 go:
-  - 1.x
+  - 1.11.x
+
+install: true 
 
 branches:
   only:
