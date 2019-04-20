@@ -50,6 +50,15 @@ if err := step2(); err != nil {
 return result
 ```
 
+The `AppendList` function can also be used to create a list of errors
+given an unknown `error` count at runtime.
+
+```go
+var errs []error
+
+multierror.AppendList(errs)
+```
+
 **Customizing the formatting of the errors**
 
 By specifying a custom `ErrorFormat`, you can customize the format

@@ -39,3 +39,22 @@ func Append(err error, errs ...error) *Error {
 		return Append(&Error{}, newErrs...)
 	}
 }
+
+// AppendList is a helper function that will append any
+// number of errors onto an Error in order to create a
+// larger multi-error.
+//
+// If any error is not a multierror.Error, then it will be turned into
+// one. If any of the errs are multierr.Error, they will be flattened
+// one level into the returned Error.
+func AppendList(errs ...error) *Error {
+	if len(errs) == 0 {
+		return new(Error)
+	}
+
+	if len(errs) == 1 {
+		return Append(errs[0])
+	}
+
+	return Append(errs[0], errs[1:]...)
+}

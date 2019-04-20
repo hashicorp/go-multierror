@@ -80,3 +80,85 @@ func TestAppend_NonError_Error(t *testing.T) {
 		t.Fatalf("wrong len: %d", len(result.Errors))
 	}
 }
+
+func TestAppendList_Error(t *testing.T) {
+	original := &Error{
+		Errors: []error{errors.New("foo")},
+	}
+
+	result := AppendList(original, errors.New("bar"))
+	if len(result.Errors) != 2 {
+		t.Fatalf("wrong len: %d", len(result.Errors))
+	}
+
+	original = &Error{}
+	result = AppendList(original, errors.New("bar"))
+	if len(result.Errors) != 1 {
+		t.Fatalf("wrong len: %d", len(result.Errors))
+	}
+
+	// Test when a typed nil is passed
+	var e *Error
+	result = AppendList(e, errors.New("baz"))
+	if len(result.Errors) != 1 {
+		t.Fatalf("wrong len: %d", len(result.Errors))
+	}
+
+	// Test flattening
+	original = &Error{
+		Errors: []error{errors.New("foo")},
+	}
+
+	result = AppendList(original, Append(nil, errors.New("foo"), errors.New("bar")))
+	if len(result.Errors) != 3 {
+		t.Fatalf("wrong len: %d", len(result.Errors))
+	}
+
+	// Test when no error is passed
+	result = AppendList()
+	if len(result.Errors) != 0 {
+		t.Fatalf("wrong len: %d", len(result.Errors))
+	}
+}
+
+func TestAppendList_NilError(t *testing.T) {
+	var err error
+	result := AppendList(err, errors.New("bar"))
+	if len(result.Errors) != 1 {
+		t.Fatalf("wrong len: %d", len(result.Errors))
+	}
+}
+
+func TestAppendList_NilErrorArg(t *testing.T) {
+	var err error
+	var nilErr *Error
+	result := AppendList(err, nilErr)
+	if len(result.Errors) != 0 {
+		t.Fatalf("wrong len: %d", len(result.Errors))
+	}
+}
+
+func TestAppendList_NilErrorIfaceArg(t *testing.T) {
+	var err error
+	var nilErr error
+	result := AppendList(err, nilErr)
+	if len(result.Errors) != 0 {
+		t.Fatalf("wrong len: %d", len(result.Errors))
+	}
+}
+
+func TestAppendList_NonError(t *testing.T) {
+	original := errors.New("foo")
+	result := AppendList(original, errors.New("bar"))
+	if len(result.Errors) != 2 {
+		t.Fatalf("wrong len: %d", len(result.Errors))
+	}
+}
+
+func TestAppendList_NonError_Error(t *testing.T) {
+	original := errors.New("foo")
+	result := AppendList(original, Append(nil, errors.New("bar")))
+	if len(result.Errors) != 2 {
+		t.Fatalf("wrong len: %d", len(result.Errors))
+	}
+}
