@@ -69,3 +69,10 @@ func TestErrorWrappedErrors(t *testing.T) {
 		t.Fatalf("bad: %s", multi.WrappedErrors())
 	}
 }
+
+func TestErrorNil(t *testing.T) {
+	var multi *Error
+	if multi.Error() != "" {
+		t.Fatalf("bad: %s", multi.Error())
+	}
+}
