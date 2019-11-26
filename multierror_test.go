@@ -1,6 +1,7 @@
 package multierror
 
 import (
+	"encoding/json"
 	"errors"
 	"reflect"
 	"testing"
@@ -67,5 +68,35 @@ func TestErrorWrappedErrors(t *testing.T) {
 	multi := &Error{Errors: errors}
 	if !reflect.DeepEqual(multi.Errors, multi.WrappedErrors()) {
 		t.Fatalf("bad: %s", multi.WrappedErrors())
+	}
+}
+
+func TestErrorJson(t *testing.T) {
+	errors := []error{
+		errors.New("foo"),
+		errors.New("bar"),
+	}
+
+	multi := &Error{Errors: errors}
+
+	b, err := json.Marshal(multi)
+	if err != nil {
+		t.Fatalf("bad: %#v", err)
+	}
+
+	actual := `{"errors":["foo","bar"]}`
+
+	if string(b) != actual {
+		t.Fatalf("bad: %#v != %#v", string(b), actual)
+	}
+
+	rebuilt := &Error{}
+	err = json.Unmarshal(b, &rebuilt)
+	if err != nil {
+		t.Fatalf("bad: %#v", err)
+	}
+
+	if !reflect.DeepEqual(rebuilt, multi) {
+		t.Fatalf("bad: %#v != %#v", rebuilt, multi)
 	}
 }
