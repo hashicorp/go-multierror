@@ -4,9 +4,19 @@ package multierror
 // onto an Error in order to create a larger multi-error.
 //
 // If err is not a multierror.Error, then it will be turned into
-// one. If any of the errs are multierr.Error, they will be flattened
+// one. If any of the errs are multierror.Error, they will be flattened
 // one level into err.
 func Append(err error, errs ...error) *Error {
+	return appendFlattenOrNo(true, err, errs...)
+}
+
+// AppendNoFlatten is just like Append, except that if any of the
+// errs are multierror.Error, they will not be flattened into err.
+func AppendNoFlatten(err error, errs ...error) *Error {
+	return appendFlattenOrNo(false, err, errs...)
+}
+
+func appendFlattenOrNo(flatten bool, err error, errs ...error) *Error {
 	switch err := err.(type) {
 	case *Error:
 		// Typed nils can reach here, so initialize if we are nil
@@ -19,7 +29,11 @@ func Append(err error, errs ...error) *Error {
 			switch e := e.(type) {
 			case *Error:
 				if e != nil {
-					err.Errors = append(err.Errors, e.Errors...)
+					if flatten {
+						err.Errors = append(err.Errors, e.Errors...)
+					} else {
+						err.Errors = append(err.Errors, e)
+					}
 				}
 			default:
 				if e != nil {
@@ -36,6 +50,6 @@ func Append(err error, errs ...error) *Error {
 		}
 		newErrs = append(newErrs, errs...)
 
-		return Append(&Error{}, newErrs...)
+		return appendFlattenOrNo(flatten, &Error{}, newErrs...)
 	}
 }
