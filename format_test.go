@@ -21,6 +21,23 @@ func TestListFormatFuncSingle(t *testing.T) {
 	}
 }
 
+func TestListFormatFuncSingleMultiLine(t *testing.T) {
+	expected := `1 error occurred:
+	* foo
+	  bar
+
+`
+
+	errors := []error{
+		errors.New("foo\nbar"),
+	}
+
+	actual := ListFormatFunc(errors)
+	if actual != expected {
+		t.Fatalf("bad: %#v", actual)
+	}
+}
+
 func TestListFormatFuncMultiple(t *testing.T) {
 	expected := `2 errors occurred:
 	* foo
@@ -31,6 +48,26 @@ func TestListFormatFuncMultiple(t *testing.T) {
 	errors := []error{
 		errors.New("foo"),
 		errors.New("bar"),
+	}
+
+	actual := ListFormatFunc(errors)
+	if actual != expected {
+		t.Fatalf("bad: %#v", actual)
+	}
+}
+
+func TestListFormatFuncMultipleMultiLine(t *testing.T) {
+	expected := `2 errors occurred:
+	* foo
+	  qux
+	* bar
+	  alp
+
+`
+
+	errors := []error{
+		errors.New("foo\nqux"),
+		errors.New("bar\nalp"),
 	}
 
 	actual := ListFormatFunc(errors)
