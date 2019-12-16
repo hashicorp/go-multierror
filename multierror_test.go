@@ -44,20 +44,6 @@ func TestErrorError_default(t *testing.T) {
 	}
 }
 
-func TestErrorErrorOrNil(t *testing.T) {
-	err := new(Error)
-	if err.ErrorOrNil() != nil {
-		t.Fatalf("bad: %#v", err.ErrorOrNil())
-	}
-
-	err.Errors = []error{errors.New("foo")}
-	if v := err.ErrorOrNil(); v == nil {
-		t.Fatal("should not be nil")
-	} else if !reflect.DeepEqual(v, err) {
-		t.Fatalf("bad: %#v", v)
-	}
-}
-
 func TestErrorWrappedErrors(t *testing.T) {
 	errors := []error{
 		errors.New("foo"),

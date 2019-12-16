@@ -14,16 +14,12 @@ be a list of errors. If the caller knows this, they can unwrap the
 list and access the errors. If the caller doesn't know, the error
 formats to a nice human-readable format.
 
-`go-multierror` implements the
-[errwrap](https://github.com/hashicorp/errwrap) interface so that it can
-be used with that library, as well.
+This is a fork of the hashicorp `go-multierror` library. In this
+fork, nil error values are handled transparently.
 
 ## Installation and Docs
 
-Install using `go get github.com/hashicorp/go-multierror`.
-
-Full documentation is available at
-http://godoc.org/github.com/hashicorp/go-multierror
+Install using `go get github.com/mspiegel/go-multierror`.
 
 ## Usage
 
@@ -38,14 +34,12 @@ if the first argument is nil, a `multierror.Error`, or any other `error`,
 the function behaves as you would expect.
 
 ```go
-var result error
+var err, result error
 
-if err := step1(); err != nil {
-	result = multierror.Append(result, err)
-}
-if err := step2(); err != nil {
-	result = multierror.Append(result, err)
-}
+err = step1()
+result = multierror.Append(result, err)
+err = step2()
+result = multierror.Append(result, err)
 
 return result
 ```
@@ -79,19 +73,4 @@ if err := something(); err != nil {
 		// Use merr.Errors
 	}
 }
-```
-
-**Returning a multierror only if there are errors**
-
-If you build a `multierror.Error`, you can use the `ErrorOrNil` function
-to return an `error` implementation only if there are errors to return:
-
-```go
-var result *multierror.Error
-
-// ... accumulate errors here
-
-// Return the `error` only if errors were added to the multierror, otherwise
-// return nil since there are no errors.
-return result.ErrorOrNil()
 ```
