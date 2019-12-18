@@ -14,7 +14,8 @@ type ErrorFormatFunc func([]error) string
 // If only one error is within the errror slice, the error is returned unformatted
 func ListFormatFunc(es []error) string {
 	if len(es) == 1 {
-		return fmt.Sprintf("%s", es[0])
+		// Formatting should be deferred to the single error present
+		return es[0].Error()
 	}
 
 	points := make([]string, len(es))
