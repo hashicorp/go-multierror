@@ -11,7 +11,7 @@ type ErrorFormatFunc func([]error) string
 
 // ListFormatFunc is a basic formatter that outputs the number of errors
 // that occurred along with a bullet point list of the errors.
-/
+//
 // If only one error is within the errror slice,
 // the formatting should be deferred to the one and only error present
 func ListFormatFunc(es []error) string {
