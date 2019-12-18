@@ -6,10 +6,7 @@ import (
 )
 
 func TestListFormatFuncSingle(t *testing.T) {
-	expected := `1 error occurred:
-	* foo
-
-`
+	expected := `foo`
 
 	errors := []error{
 		errors.New("foo"),
