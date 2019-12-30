@@ -30,9 +30,12 @@ func (g *Group) Go(f func() error) {
 
 // Wait blocks until all function calls from the Go method have returned, then
 // returns the multierror.
-func (g *Group) Wait() *Error {
+func (g *Group) Wait() error {
 	g.wg.Wait()
 	g.mutex.Lock()
 	defer g.mutex.Unlock()
-	return g.err
+	if g.err != nil {
+		return g.err
+	}
+	return nil
 }

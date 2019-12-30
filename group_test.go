@@ -30,8 +30,11 @@ func TestGroup(t *testing.T) {
 
 		}
 
-		gErr := g.Wait()
+		var gErr error = g.Wait()
 		if gErr != nil {
+			if tc.nilResult {
+				t.Fatalf("Group.Wait() should have returned nil for errors")
+			}
 			for i := range tc.errs {
 				if tc.errs[i] != nil && !strings.Contains(gErr.Error(), tc.errs[i].Error()) {
 					t.Fatalf("expected error to contain %q, actual: %v", tc.errs[i].Error(), gErr)
