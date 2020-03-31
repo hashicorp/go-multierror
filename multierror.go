@@ -68,6 +68,11 @@ func (e *Error) Unwrap() error {
 		return nil
 	}
 
+	// If we have exactly one error, we can just return that directly.
+	if len(e.Errors) == 1 {
+		return e.Errors[0]
+	}
+
 	// Shallow copy the slice
 	errs := make([]error, len(e.Errors))
 	copy(errs, e.Errors)
