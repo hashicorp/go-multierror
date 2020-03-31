@@ -88,6 +88,8 @@ func (e *Error) Unwrap() error {
 // the wrapped error here but we can't do that if we want to properly
 // get access to all the errors. Instead, users are recommended to use
 // Is/As to get the correct error type out.
+//
+// Precondition: []error is non-empty (len > 0)
 type chain []error
 
 // Error implements the error interface
