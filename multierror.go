@@ -102,7 +102,7 @@ func (e chain) Unwrap() error {
 		return nil
 	}
 
-	return chain(e[1:])
+	return e[1:]
 }
 
 // As implements errors.As by attempting to map to the current value.
@@ -112,5 +112,5 @@ func (e chain) As(target interface{}) bool {
 
 // Is implements errors.Is by comparing the current value directly.
 func (e chain) Is(target error) bool {
-	return e[0] == target
+	return errors.Is(e[0], target)
 }
