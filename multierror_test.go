@@ -2,6 +2,7 @@ package multierror
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -121,6 +122,18 @@ func TestErrorIs(t *testing.T) {
 		}
 	})
 
+	t.Run("with errBar wrapped by fmt.Errorf", func(t *testing.T) {
+		err := &Error{Errors: []error{
+			errors.New("foo"),
+			fmt.Errorf("errorf: %w", errBar),
+			errors.New("baz"),
+		}}
+
+		if !errors.Is(err, errBar) {
+			t.Fatal("should be true")
+		}
+	})
+
 	t.Run("without errBar", func(t *testing.T) {
 		err := &Error{Errors: []error{
 			errors.New("foo"),
@@ -140,6 +153,22 @@ func TestErrorAs(t *testing.T) {
 		err := &Error{Errors: []error{
 			errors.New("foo"),
 			match,
+			errors.New("baz"),
+		}}
+
+		var target *nestedError
+		if !errors.As(err, &target) {
+			t.Fatal("should be true")
+		}
+		if target == nil {
+			t.Fatal("target should not be nil")
+		}
+	})
+
+	t.Run("with the value wrapped by fmt.Errorf", func(t *testing.T) {
+		err := &Error{Errors: []error{
+			errors.New("foo"),
+			fmt.Errorf("errorf: %w", match),
 			errors.New("baz"),
 		}}
 
