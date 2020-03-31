@@ -76,8 +76,7 @@ func (e *Error) Unwrap() error {
 	// Shallow copy the slice
 	errs := make([]error, len(e.Errors))
 	copy(errs, e.Errors)
-
-	return &chain{errors: errs}
+	return chain(errs)
 }
 
 // chain implements the interfaces necessary for errors.Is/As/Unwrap to
@@ -89,37 +88,29 @@ func (e *Error) Unwrap() error {
 // the wrapped error here but we can't do that if we want to properly
 // get access to all the errors. Instead, users are recommended to use
 // Is/As to get the correct error type out.
-type chain struct {
-	idx    int
-	errors []error
-}
+type chain []error
 
 // Error implements the error interface
-func (e *chain) Error() string {
-	return e.current().Error()
+func (e chain) Error() string {
+	return e[0].Error()
 }
 
 // Unwrap implements errors.Unwrap by returning the next error in the
 // chain or nil if there are no more errors.
-func (e *chain) Unwrap() error {
-	next := e.idx + 1
-	if len(e.errors) <= next {
+func (e chain) Unwrap() error {
+	if len(e) == 1 {
 		return nil
 	}
 
-	return &chain{idx: next, errors: e.errors}
+	return chain(e[1:])
 }
 
 // As implements errors.As by attempting to map to the current value.
-func (e *chain) As(target interface{}) bool {
-	return errors.As(e.current(), target)
+func (e chain) As(target interface{}) bool {
+	return errors.As(e[0], target)
 }
 
 // Is implements errors.Is by comparing the current value directly.
-func (e *chain) Is(target error) bool {
-	return e.current() == target
-}
-
-func (e *chain) current() error {
-	return e.errors[e.idx]
+func (e chain) Is(target error) bool {
+	return e[0] == target
 }
