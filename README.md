@@ -37,7 +37,7 @@ If you need to use an earlier version of go, you can use the
 tag, which doesn't rely on features in go 1.13.
 
 If you see compile errors that look like the below, it's likely that
-you're on an older version of go.
+you're on an older version of go:
 
 ```
 /go/src/github.com/hashicorp/go-multierror/multierror.go:112:9: undefined: errors.As
