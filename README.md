@@ -4,7 +4,7 @@
 [![Go Documentation](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)][godocs]
 
 [travis]: https://travis-ci.org/hashicorp/go-multierror
-[godocs]: https://godoc.org/github.com/hashicorp/go-multierror
+[godocs]: https://pkg.go.dev/github.com/hashicorp/go-multierror
 
 `go-multierror` is a package for Go that provides a mechanism for
 representing a list of `error` values as a single `error`.
@@ -24,7 +24,7 @@ for introspecting on error values.
 Install using `go get github.com/hashicorp/go-multierror`.
 
 Full documentation is available at
-http://godoc.org/github.com/hashicorp/go-multierror
+https://pkg.go.dev/github.com/hashicorp/go-multierror
 
 ## Usage
 
