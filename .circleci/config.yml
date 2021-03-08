@@ -160,5 +160,5 @@ workflows:
           matrix:
             parameters:
               go-version: ["1.13", "1.14", "1.15"]
-              gotestsum-version: ["0.4.1"]
+              gotestsum-version: ["1.6.2"]
           name: win-test-go-<< matrix.go-version >>
