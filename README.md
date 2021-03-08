@@ -1,9 +1,10 @@
 # go-multierror
 
-[![Build Status](http://img.shields.io/travis/hashicorp/go-multierror.svg?style=flat-square)][travis]
-[![Go Documentation](http://img.shields.io/badge/go-documentation-blue.svg?style=flat-square)][godocs]
+[![CircleCI](https://img.shields.io/circleci/build/github/hashicorp/go-multierror/master)](https://circleci.com/gh/hashicorp/go-multierror)
+[![Go Reference](https://pkg.go.dev/badge/github.com/hashicorp/go-multierror.svg)](https://pkg.go.dev/github.com/hashicorp/go-multierror)
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/hashicorp/go-multierror)
 
-[travis]: https://travis-ci.org/hashicorp/go-multierror
+[circleci]: https://app.circleci.com/pipelines/github/hashicorp/go-multierror
 [godocs]: https://pkg.go.dev/github.com/hashicorp/go-multierror
 
 `go-multierror` is a package for Go that provides a mechanism for
