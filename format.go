@@ -25,3 +25,6 @@ func ListFormatFunc(es []error) string {
 		"%d errors occurred:\n\t%s\n\n",
 		len(es), strings.Join(points, "\n\t"))
 }
+
+// DefaultErrorFormatFunc is global default ErrorFormatFunc
+var DefaultErrorFormatFunc ErrorFormatFunc = ListFormatFunc
