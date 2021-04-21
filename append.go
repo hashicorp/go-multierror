@@ -8,7 +8,7 @@ package multierror
 // one level into err.
 // Any nil errors within errs will be ignored. If err is nil, a new
 // *Error will be returned.
-func Append(err error, errs ...error) *Error {
+func Append(err error, errs ...error) error {
 	switch err := err.(type) {
 	case *Error:
 		// Typed nils can reach here, so initialize if we are nil
@@ -30,7 +30,14 @@ func Append(err error, errs ...error) *Error {
 			}
 		}
 
-		return err
+		switch err.Len() {
+		case 0:
+			return nil
+		case 1:
+			return err.Errors[0]
+		default:
+			return err
+		}
 	default:
 		newErrs := make([]error, 0, len(errs)+1)
 		if err != nil {
