@@ -44,6 +44,26 @@ you're on an older version of go:
 /go/src/github.com/hashicorp/go-multierror/multierror.go:112:9: undefined: errors.As
 /go/src/github.com/hashicorp/go-multierror/multierror.go:117:9: undefined: errors.Is
 ```
+### Compatibility notice
+
+The following function signatures have been changed to return the
+stdlib `error` interface (as per the best practices). If your code
+relies on always having a `*Error` type then you can use `Cast` to
+convert from the stdlib `error` interface into a `*Error`.
+
+New signatures:
+```go
+func Append(err error, errs ...error) error
+
+func (g *Group) Wait() error
+```
+
+Casting example:
+```go
+var err error
+var result *multierror.Error
+result = Cast(err)
+```
 
 ## Usage
 
