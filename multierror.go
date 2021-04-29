@@ -1,6 +1,7 @@
 package multierror
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 )
@@ -38,6 +39,30 @@ func (e *Error) ErrorOrNil() error {
 
 func (e *Error) GoString() string {
 	return fmt.Sprintf("*%#v", *e)
+}
+
+// MarshalJSON returns a valid json representation of a multierror,
+// as an object with an array of error strings.
+func (e *Error) MarshalJSON() ([]byte, error) {
+	j := []string{}
+	for _, err := range e.Errors {
+		j = append(j, err.Error())
+	}
+	return json.Marshal(j)
+}
+
+// UnmarshalJSON from an array of strings.
+func (e *Error) UnmarshalJSON(b []byte) error {
+	j := []string{}
+	if err := json.Unmarshal(b, &j); err != nil {
+		return err
+	}
+	if j != nil {
+		for _, msg := range j {
+			e.Errors = append(e.Errors, fmt.Errorf(msg))
+		}
+	}
+	return nil
 }
 
 // WrappedErrors returns the list of errors that this Error is wrapping. It is
