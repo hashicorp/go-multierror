@@ -1,6 +1,7 @@
 package multierror
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"reflect"
@@ -42,6 +43,29 @@ func TestErrorError_default(t *testing.T) {
 	multi := &Error{Errors: errors}
 	if multi.Error() != expected {
 		t.Fatalf("bad: %s", multi.Error())
+	}
+}
+
+func TestError_json(t *testing.T) {
+	errs := []error{
+		errors.New("foo"),
+		errors.New("bar"),
+	}
+	multi := Error{Errors: errs}
+	b, err := json.Marshal(&multi)
+	if err != nil {
+		t.Fatalf("unexpected error; got %#v", err)
+	}
+	j := `{"errors":["foo","bar"]}`
+	if string(b) != j {
+		t.Errorf("bad representation; got: %s, want: %s", string(b), j)
+	}
+	rebuilt := Error{}
+	if err = json.Unmarshal(b, &rebuilt); err != nil {
+		t.Fatalf("unexpected error; go %#v", err)
+	}
+	if !reflect.DeepEqual(rebuilt, multi) {
+		t.Fatalf("mismatched types; got: %v, want: %v", rebuilt, multi)
 	}
 }
 
