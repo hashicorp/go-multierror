@@ -56,7 +56,7 @@ func TestError_json(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error; got %#v", err)
 	}
-	j := `{"errors":["foo","bar"]}`
+	j := `["foo","bar"]`
 	if string(b) != j {
 		t.Errorf("bad representation; got: %s, want: %s", string(b), j)
 	}

@@ -44,23 +44,21 @@ func (e *Error) GoString() string {
 // MarshalJSON returns a valid json representation of a multierror,
 // as an object with an array of error strings.
 func (e *Error) MarshalJSON() ([]byte, error) {
-	j := map[string][]string{
-		"errors": []string{},
-	}
+	j := []string{}
 	for _, err := range e.Errors {
-		j["errors"] = append(j["errors"], err.Error())
+		j = append(j, err.Error())
 	}
 	return json.Marshal(j)
 }
 
 // UnmarshalJSON from an array of strings.
 func (e *Error) UnmarshalJSON(b []byte) error {
-	j := make(map[string][]string)
+	j := []string{}
 	if err := json.Unmarshal(b, &j); err != nil {
 		return err
 	}
-	if j["errors"] != nil {
-		for _, msg := range j["errors"] {
+	if j != nil {
+		for _, msg := range j {
 			e.Errors = append(e.Errors, fmt.Errorf(msg))
 		}
 	}
