@@ -1,8 +1,8 @@
 package multierror
 
 import (
-	"errors"
 	"encoding/json"
+	"errors"
 	"fmt"
 )
 
