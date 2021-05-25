@@ -1,0 +1,29 @@
+on:
+  push:
+    branches:
+      - master
+      - migrate-tests-to-actions
+  pull_request:
+    branches:
+      - master
+jobs:
+  test:
+    env:
+      GO111MODULE: on
+    strategy:
+      matrix:
+        go-version: [1.13.x, 1.14.x, 1.15.x, 1.16.x]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Install Go
+      uses: actions/setup-go@37335c7bb261b353407cff977110895fa0b4f7d8
+      with:
+        go-version: ${{ matrix.go-version }}
+    - name: Checkout code
+      uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
+    - name: Run tests
+      run: |
+        go fmt ./...
+        go mod download
+        gotestsum
