@@ -11,11 +11,6 @@ package multierror
 func Append(err error, errs ...error) *Error {
 	switch err := err.(type) {
 	case *Error:
-		// Typed nils can reach here, so initialize if we are nil
-		if err == nil {
-			err = new(Error)
-		}
-
 		// Go through each error and flatten
 		for _, e := range errs {
 			switch e := e.(type) {
