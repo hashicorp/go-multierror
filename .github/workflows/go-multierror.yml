@@ -1,120 +1,91 @@
 name: hashicorp/go-multierror/go-multierror
 on:
   push:
-    branches:
-      - master
+
+permissions:
+  contents: read
+
 jobs:
-  linux-tests:
+  go-fmt:
     runs-on: ubuntu-latest
-    container:
-      image: docker.mirror.hashicorp.services/circleci/golang:${{ matrix.go-version }}
-    env:
-      TEST_RESULTS_PATH: "/tmp/test-results"
-      WIN_TEST_RESULTS: c:\Users\circleci\AppData\Local\Temp\test-results
-    strategy:
-      matrix:
-        go-version:
-          - '1.13'
-          - '1.14'
-          - '1.15'
     steps:
       - run: go version
       - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
-      - uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
+      - uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # v4.0.0
         with:
-          path: "."
-      - run: mkdir -p $TEST_RESULTS_PATH/go-multierror
-      - name: restore_cache
-        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
-        with:
-          key: linux-gomod-cache-v1-{{ checksum "go.mod" }}
-          restore-keys: linux-gomod-cache-v1-{{ checksum "go.mod" }}
-          path: "/go/pkg/mod"
-      - run: go mod download
+          go-version-file: go.mod
       - name: check go fmt
         run: |-
-          files=$(go fmt ./...)
+          files="$(go fmt ./...)"
           if [ -n "$files" ]; then
             echo "The following file(s) do not conform to go fmt:"
             echo "$files"
             exit 1
           fi
-      - uses: "./.github/actions/run-gotests"
-        with:
-          cmd: gotestsum
-          platform: linux
-      - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
-        with:
-          path: "./linux_cov_*.part"
-      - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
-        with:
-          path: "/tmp/test-results"
-      - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
-        with:
-          path: "/tmp/test-results"
-  windows-tests:
-    defaults:
-      run:
-        working-directory: c:\gopath\src\github.com\hashicorp\go-multierror
+
+  linux-tests:
     runs-on: ubuntu-latest
     env:
-      TEST_RESULTS_PATH: "/tmp/test-results"
-      WIN_TEST_RESULTS: c:\Users\circleci\AppData\Local\Temp\test-results
+      TEST_RESULTS_PATH: '/tmp/test-results'
     strategy:
       matrix:
         go-version:
-          - '1.13'
-          - '1.14'
-          - '1.15'
-        gotestsum-version:
-          - 1.6.2
+          - '1.13' # oldest supported; named in go.mod
+          - 'oldstable'
+          - 'stable'
     steps:
-      - run: git config --global core.autocrlf false
       - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
-      - uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
+      - uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # v4.0.0
         with:
-          path: "."
-      - name: Setup (remove pre-installed go)
-        run: |-
-          rm -rf "c:\Go"
-          mkdir -p $TEST_RESULTS_PATH/go-multierror
-      - name: restore_cache
-        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
+          go-version: ${{ matrix.go-version }}
+      - uses: autero1/action-gotestsum@2e48af62f5248bd3b014f598cd1aa69a01dd36e3 # v1.0.0
         with:
-          key: win-golang-${{ matrix.go-version }}-cache-v1
-          restore-keys: |-
-            win-golang-${{ matrix.go-version }}-cache-v1
-            win-gomod-cache-{{ checksum "go.mod" }}-v1
-          path: "/go"
-      - name: Install go version ${{ matrix.go-version }}
+          gotestsum_version: 1.9.0
+      - run: |
+          go version
+          go env
+      - run: mkdir -p "$TEST_RESULTS_PATH/go-multierror"
+      - name: Run go tests
+        env:
+          PLATFORM: linux
+          REPORT_FILE: ${{ env.TEST_RESULTS_PATH }}/go-multierror/gotestsum-report.xml
         run: |-
-          if [ ! -d "c:\go" ]; then
-            echo "Cache not found, installing new version of go"
-            curl --fail --location https://dl.google.com/go/go${{ matrix.go-version }}.windows-amd64.zip --output go.zip
-            unzip go.zip -d "/c"
-          fi
+          gotestsum --format=short-verbose --junitfile ${{ env.REPORT_FILE }} -- -p 2 ./...
+      - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+        with:
+          path: ${{ env.TEST_RESULTS_PATH }}
+          name: tests-linux
+
+  windows-tests:
+    runs-on: windows-latest
+    env:
+      TEST_RESULTS_PATH: 'c:\Users\runneradmin\AppData\Local\Temp\test-results'
+    strategy:
+      matrix:
+        go-version:
+          - '1.13' # oldest supported; named in go.mod
+          - 'oldstable'
+          - 'stable'
+    steps:
+      - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+      - uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 # v4.0.0
+        with:
+          go-version: ${{ matrix.go-version }}
+      - run: |
+          go version
+          go env
+      - run: git config --global core.autocrlf false
       - run: go mod download
-      - name: save_cache
-        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
+      - uses: autero1/action-gotestsum@2e48af62f5248bd3b014f598cd1aa69a01dd36e3 # v1.0.0
         with:
-          path: c:\Windows\system32\config\systemprofile\go\pkg\mod
-          key: win-gomod-cache-{{ checksum "go.mod" }}-v1
-      - name: Install gotestsum
+          gotestsum_version: 1.9.0
+      - name: Run go tests
+        env:
+          PLATFORM: win
+          REPORT_FILE: ${{ env.TEST_RESULTS_PATH }}/go-multierror/gotestsum-report.xml
         run: |-
-          curl --fail --location https://github.com/gotestyourself/gotestsum/releases/download/v${{ matrix.gotestsum-version }}/gotestsum_${{ matrix.gotestsum-version }}_windows_amd64.tar.gz --output gotestsum.tar.gz
-          tar -xvzf gotestsum.tar.gz
-      - uses: "./.github/actions/run-gotests"
-        with:
-          cmd: "./gotestsum.exe"
-          platform: win
+          gotestsum.exe --format=short-verbose --junitfile ${{ env.REPORT_FILE }} -- -p 2 ./...
       - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
         with:
-          path: "./win_cov_*.part"
-      - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
-        with:
-          path: c:\Users\circleci\AppData\Local\Temp\test-results
-      - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
-        with:
-          path: c:\Users\circleci\AppData\Local\Temp\test-results
-permissions:
-  contents: read
+          path: ${{ env.TEST_RESULTS_PATH }}
+          name: tests-windows
