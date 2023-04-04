@@ -19,13 +19,13 @@ jobs:
         - '1.15'
     steps:
     - run: go version
-    - uses: actions/checkout@v3.5.0
-    - uses: actions/download-artifact@v3.0.1
+    - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+    - uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
       with:
         path: "."
     - run: mkdir -p $TEST_RESULTS_PATH/go-multierror
     - name: restore_cache
-      uses: actions/cache@v3.3.1
+      uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
       with:
         key: linux-gomod-cache-v1-{{ checksum "go.mod" }}
         restore-keys: linux-gomod-cache-v1-{{ checksum "go.mod" }}
@@ -43,13 +43,13 @@ jobs:
       with:
         cmd: gotestsum
         platform: linux
-    - uses: actions/upload-artifact@v3.1.1
+    - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
       with:
         path: "./linux_cov_*.part"
-    - uses: actions/upload-artifact@v3.1.1
+    - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
       with:
         path: "/tmp/test-results"
-    - uses: actions/upload-artifact@v3.1.1
+    - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
       with:
         path: "/tmp/test-results"
   windows-tests:
@@ -70,8 +70,8 @@ jobs:
         - 1.6.2
     steps:
     - run: git config --global core.autocrlf false
-    - uses: actions/checkout@v3.5.0
-    - uses: actions/download-artifact@v3.0.1
+    - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+    - uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
       with:
         path: "."
     - name: Setup (remove pre-installed go)
@@ -79,7 +79,7 @@ jobs:
         rm -rf "c:\Go"
         mkdir -p $TEST_RESULTS_PATH/go-multierror
     - name: restore_cache
-      uses: actions/cache@v3.3.1
+      uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
       with:
         key: win-golang-${{ matrix.go-version }}-cache-v1
         restore-keys: |-
@@ -95,7 +95,7 @@ jobs:
         fi
     - run: go mod download
     - name: save_cache
-      uses: actions/cache@v3.3.1
+      uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
       with:
         path: c:\Windows\system32\config\systemprofile\go\pkg\mod
         key: win-gomod-cache-{{ checksum "go.mod" }}-v1
@@ -107,12 +107,12 @@ jobs:
       with:
         cmd: "./gotestsum.exe"
         platform: win
-    - uses: actions/upload-artifact@v3.1.1
+    - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
       with:
         path: "./win_cov_*.part"
-    - uses: actions/upload-artifact@v3.1.1
+    - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
       with:
         path: c:\Users\circleci\AppData\Local\Temp\test-results
-    - uses: actions/upload-artifact@v3.1.1
+    - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
       with:
         path: c:\Users\circleci\AppData\Local\Temp\test-results
