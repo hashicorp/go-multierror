@@ -1,0 +1,118 @@
+name: hashicorp/go-multierror/go-multierror
+on:
+  push:
+    branches:
+    - master
+jobs:
+  linux-tests:
+    runs-on: ubuntu-latest
+    container:
+      image: docker.mirror.hashicorp.services/circleci/golang:${{ matrix.go-version }}
+    env:
+      TEST_RESULTS_PATH: "/tmp/test-results"
+      WIN_TEST_RESULTS: c:\Users\circleci\AppData\Local\Temp\test-results
+    strategy:
+      matrix:
+        go-version:
+        - '1.13'
+        - '1.14'
+        - '1.15'
+    steps:
+    - run: go version
+    - uses: actions/checkout@v3.5.0
+    - uses: actions/download-artifact@v3.0.1
+      with:
+        path: "."
+    - run: mkdir -p $TEST_RESULTS_PATH/go-multierror
+    - name: restore_cache
+      uses: actions/cache@v3.3.1
+      with:
+        key: linux-gomod-cache-v1-{{ checksum "go.mod" }}
+        restore-keys: linux-gomod-cache-v1-{{ checksum "go.mod" }}
+        path: "/go/pkg/mod"
+    - run: go mod download
+    - name: check go fmt
+      run: |-
+        files=$(go fmt ./...)
+        if [ -n "$files" ]; then
+          echo "The following file(s) do not conform to go fmt:"
+          echo "$files"
+          exit 1
+        fi
+    - uses: "./.github/actions/run-gotests"
+      with:
+        cmd: gotestsum
+        platform: linux
+    - uses: actions/upload-artifact@v3.1.1
+      with:
+        path: "./linux_cov_*.part"
+    - uses: actions/upload-artifact@v3.1.1
+      with:
+        path: "/tmp/test-results"
+    - uses: actions/upload-artifact@v3.1.1
+      with:
+        path: "/tmp/test-results"
+  windows-tests:
+    defaults:
+      run:
+        working-directory: c:\gopath\src\github.com\hashicorp\go-multierror
+    runs-on: ubuntu-latest
+    env:
+      TEST_RESULTS_PATH: "/tmp/test-results"
+      WIN_TEST_RESULTS: c:\Users\circleci\AppData\Local\Temp\test-results
+    strategy:
+      matrix:
+        go-version:
+        - '1.13'
+        - '1.14'
+        - '1.15'
+        gotestsum-version:
+        - 1.6.2
+    steps:
+    - run: git config --global core.autocrlf false
+    - uses: actions/checkout@v3.5.0
+    - uses: actions/download-artifact@v3.0.1
+      with:
+        path: "."
+    - name: Setup (remove pre-installed go)
+      run: |-
+        rm -rf "c:\Go"
+        mkdir -p $TEST_RESULTS_PATH/go-multierror
+    - name: restore_cache
+      uses: actions/cache@v3.3.1
+      with:
+        key: win-golang-${{ matrix.go-version }}-cache-v1
+        restore-keys: |-
+          win-golang-${{ matrix.go-version }}-cache-v1
+          win-gomod-cache-{{ checksum "go.mod" }}-v1
+        path: "/go"
+    - name: Install go version ${{ matrix.go-version }}
+      run: |-
+        if [ ! -d "c:\go" ]; then
+          echo "Cache not found, installing new version of go"
+          curl --fail --location https://dl.google.com/go/go${{ matrix.go-version }}.windows-amd64.zip --output go.zip
+          unzip go.zip -d "/c"
+        fi
+    - run: go mod download
+    - name: save_cache
+      uses: actions/cache@v3.3.1
+      with:
+        path: c:\Windows\system32\config\systemprofile\go\pkg\mod
+        key: win-gomod-cache-{{ checksum "go.mod" }}-v1
+    - name: Install gotestsum
+      run: |-
+        curl --fail --location https://github.com/gotestyourself/gotestsum/releases/download/v${{ matrix.gotestsum-version }}/gotestsum_${{ matrix.gotestsum-version }}_windows_amd64.tar.gz --output gotestsum.tar.gz
+        tar -xvzf gotestsum.tar.gz
+    - uses: "./.github/actions/run-gotests"
+      with:
+        cmd: "./gotestsum.exe"
+        platform: win
+    - uses: actions/upload-artifact@v3.1.1
+      with:
+        path: "./win_cov_*.part"
+    - uses: actions/upload-artifact@v3.1.1
+      with:
+        path: c:\Users\circleci\AppData\Local\Temp\test-results
+    - uses: actions/upload-artifact@v3.1.1
+      with:
+        path: c:\Users\circleci\AppData\Local\Temp\test-results
