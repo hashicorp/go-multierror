@@ -1,0 +1,16 @@
+name: run-gotests
+inputs:
+  cmd:
+    required: false
+  platform:
+    required: false
+runs:
+  using: composite
+  steps:
+  - name: Run go tests
+    run: |-
+      PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
+      echo "Running $(echo $PACKAGE_NAMES | wc -w) packages"
+      echo $PACKAGE_NAMES
+      ${{ inputs.cmd }} --format=short-verbose --junitfile $TEST_RESULTS_PATH/go-multierror/gotestsum-report.xml -- -p 2 -cover -coverprofile=${{ inputs.platform }}_cov_$CIRCLE_NODE_INDEX.part $PACKAGE_NAMES
+    shell: bash
