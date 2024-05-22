@@ -22,13 +22,18 @@ func (g *Group) Go(f func() error) {
 
 	go func() {
 		defer g.wg.Done()
-
-		if err := f(); err != nil {
-			g.mutex.Lock()
-			g.err = Append(g.err, err)
-			g.mutex.Unlock()
-		}
+		g.Add(f())
 	}()
+}
+
+// Add error to group.
+func (g *Group) Add(err error) {
+	if err == nil {
+		return
+	}
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
+	g.err = Append(g.err, err)
 }
 
 // Wait blocks until all function calls from the Go method have returned, then
