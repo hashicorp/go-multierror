@@ -54,7 +54,7 @@ jobs:
       - uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
           path: ${{ env.TEST_RESULTS_PATH }}
-          name: tests-linux
+          name: tests-linux-${{ matrix.go-version }}
 
   windows-tests:
     runs-on: windows-latest
@@ -88,4 +88,4 @@ jobs:
       - uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
           path: ${{ env.TEST_RESULTS_PATH }}
-          name: tests-windows
+          name: tests-windows-${{ matrix.go-version }}
