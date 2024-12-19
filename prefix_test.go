@@ -37,3 +37,15 @@ func TestPrefix_NonError(t *testing.T) {
 		t.Fatalf("bad: %s", result)
 	}
 }
+
+func TestPrefix_NilErrorArg(t *testing.T) {
+	var nilErr *Error
+	result := Prefix(nilErr, "bar")
+	expected := `0 errors occurred:
+	
+
+`
+	if expected != result.Error() {
+		t.Fatalf("bad: %#v", result.Error())
+	}
+}
