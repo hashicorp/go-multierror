@@ -100,3 +100,4 @@ jobs:
           path: coverage-win.out
           name: Coverage-report-win-${{matrix.go-version}}
       - run: go tool cover -func=coverage-win.out
+        shell: cmd
