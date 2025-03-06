@@ -60,7 +60,7 @@ jobs:
         with:
           path: coverage-linux.out
           name: Coverage-report-linux-${{matrix.go-version}}
-      - run: go tool cover -func=coverage.out
+      - run: go tool cover -func=coverage-linux.out
 
   windows-tests:
     runs-on: windows-latest
@@ -90,7 +90,7 @@ jobs:
           PLATFORM: win
           REPORT_FILE: ${{ env.TEST_RESULTS_PATH }}/go-multierror/gotestsum-report.xml
         run: |-
-          gotestsum.exe --format=short-verbose --junitfile ${{ env.REPORT_FILE }} -- -p 2 -cover -coverprofile=coverage-win.out ./...
+          gotestsum.exe --format=short-verbose --junitfile ${{ env.REPORT_FILE }} -- -p 2 -cover -coverprofile="coverage-win.out" ./...
       - uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
           path: ${{ env.TEST_RESULTS_PATH }}
@@ -99,4 +99,4 @@ jobs:
         with:
           path: coverage-win.out
           name: Coverage-report-win-${{matrix.go-version}}
-      - run: go tool cover -func=coverage.out
+      - run: go tool cover -func=coverage-win.out
