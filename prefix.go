@@ -18,7 +18,6 @@ func Prefix(err error, prefix string) error {
 		return nil
 	}
 
-	format := fmt.Sprintf("%s {{err}}", prefix)
 	switch err := err.(type) {
 	case *Error:
 		// Typed nils can reach here, so initialize if we are nil
@@ -28,11 +27,11 @@ func Prefix(err error, prefix string) error {
 
 		// Wrap each of the errors
 		for i, e := range err.Errors {
-			err.Errors[i] = fmt.Errorf(format, e)
+			err.Errors[i] = fmt.Errorf("%s %s", prefix, e)
 		}
 
 		return err
 	default:
-		return fmt.Errorf(format, err)
+		return fmt.Errorf("%s %s", prefix, err)
 	}
 }
