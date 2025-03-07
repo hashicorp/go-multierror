@@ -5,8 +5,6 @@ package multierror
 
 import (
 	"fmt"
-
-	"github.com/hashicorp/errwrap"
 )
 
 // Prefix is a helper function that will prefix some text
@@ -30,11 +28,11 @@ func Prefix(err error, prefix string) error {
 
 		// Wrap each of the errors
 		for i, e := range err.Errors {
-			err.Errors[i] = errwrap.Wrapf(format, e)
+			err.Errors[i] = fmt.Errorf(format, e)
 		}
 
 		return err
 	default:
-		return errwrap.Wrapf(format, err)
+		return fmt.Errorf(format, err)
 	}
 }
