@@ -1,6 +1,7 @@
 name: hashicorp/go-multierror/go-multierror
 on:
-  push:
+  - push
+  - pull_request
 
 permissions:
   contents: read
@@ -9,9 +10,12 @@ jobs:
   go-fmt:
     runs-on: ubuntu-latest
     steps:
-      - run: go version
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-      - uses: actions/setup-go@cdcb36043654635271a94b9a6d1392de5bb323a7 # v5.0.1
+      - name: Get go-version
+        run: go version
+      - name: Checkout code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - name: Setup go
+        uses: actions/setup-go@cdcb36043654635271a94b9a6d1392de5bb323a7 # v5.0.1
         with:
           go-version-file: go.mod
       - name: check go fmt
@@ -34,27 +38,40 @@ jobs:
           - 'oldstable'
           - 'stable'
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-      - uses: actions/setup-go@cdcb36043654635271a94b9a6d1392de5bb323a7 # v5.0.1
+      - name: Checkout code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332   # v4.1.7
+      - name: Setup go
+        uses: actions/setup-go@cdcb36043654635271a94b9a6d1392de5bb323a7   # v5.0.1
         with:
           go-version: ${{ matrix.go-version }}
-      - uses: autero1/action-gotestsum@7263b9d73912eec65f46337689e59fac865c425f # v2.0.0
+      - name: Install gotestsum
+        uses: autero1/action-gotestsum@7263b9d73912eec65f46337689e59fac865c425f # v2.0.0
         with:
           gotestsum_version: 1.9.0
-      - run: |
+      - name: Get go version and env
+        run: |
           go version
           go env
-      - run: mkdir -p "$TEST_RESULTS_PATH/go-multierror"
+      - name: Create test directory
+        run: mkdir -p "$TEST_RESULTS_PATH/go-multierror"
       - name: Run go tests
         env:
           PLATFORM: linux
           REPORT_FILE: ${{ env.TEST_RESULTS_PATH }}/go-multierror/gotestsum-report.xml
         run: |-
-          gotestsum --format=short-verbose --junitfile ${{ env.REPORT_FILE }} -- -p 2 ./...
-      - uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+          gotestsum --format=short-verbose --junitfile ${{ env.REPORT_FILE }} -- -p 2 -cover -coverprofile=coverage-linux.out ./...
+      - name: Upload and save artifacts
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
           path: ${{ env.TEST_RESULTS_PATH }}
           name: tests-linux-${{ matrix.go-version }}
+      - name: Upload coverage report
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+        with:
+          path: coverage-linux.out
+          name: Coverage-report-linux-${{matrix.go-version}}
+      - name: Display coverage report
+        run: go tool cover -func=coverage-linux.out
 
   windows-tests:
     runs-on: windows-latest
@@ -67,16 +84,21 @@ jobs:
           - 'oldstable'
           - 'stable'
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-      - uses: actions/setup-go@cdcb36043654635271a94b9a6d1392de5bb323a7 # v5.0.1
+      - name: Checkout code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - name: Setup Go
+        uses: actions/setup-go@cdcb36043654635271a94b9a6d1392de5bb323a7 # v5.0.1
         with:
           go-version: ${{ matrix.go-version }}
-      - run: |
+      - name: Get go-version and env
+        run: |
           go version
           go env
       - run: git config --global core.autocrlf false
-      - run: go mod download
-      - uses: autero1/action-gotestsum@7263b9d73912eec65f46337689e59fac865c425f # v2.0.0
+      - name: Download go modules
+        run: go mod download
+      - name: Install gotestsum
+        uses: autero1/action-gotestsum@7263b9d73912eec65f46337689e59fac865c425f # v2.0.0
         with:
           gotestsum_version: 1.9.0
       - name: Run go tests
@@ -84,8 +106,17 @@ jobs:
           PLATFORM: win
           REPORT_FILE: ${{ env.TEST_RESULTS_PATH }}/go-multierror/gotestsum-report.xml
         run: |-
-          gotestsum.exe --format=short-verbose --junitfile ${{ env.REPORT_FILE }} -- -p 2 ./...
-      - uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+          gotestsum.exe --format=short-verbose --junitfile ${{ env.REPORT_FILE }} -- -p 2 -cover -coverprofile="coverage-win.out" ./...
+      - name: Upload and save artifacts
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
           path: ${{ env.TEST_RESULTS_PATH }}
           name: tests-windows-${{ matrix.go-version }}
+      - name: Upload coverage test
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+        with:
+          path: coverage-win.out
+          name: Coverage-report-win-${{matrix.go-version}}
+      - name: Display coverage report
+        run: go tool cover -func=coverage-win.out
+        shell: cmd
