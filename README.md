@@ -87,6 +87,16 @@ if result != nil {
 }
 ```
 
+or 
+
+```go
+func init() {
+  multierror.ListFormatFunc = func([]error) string {
+    return "errors!"
+  }
+}
+```
+
 **Accessing the list of errors**
 
 `multierror.Error` implements `error` so if the caller doesn't know about
