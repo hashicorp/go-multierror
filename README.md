@@ -7,6 +7,86 @@
 [circleci]: https://app.circleci.com/pipelines/github/hashicorp/go-multierror
 [godocs]: https://pkg.go.dev/github.com/hashicorp/go-multierror
 
+> **Note**: As of Go 1.20, the standard library provides [`errors.Join`](https://pkg.go.dev/errors#Join) which offers similar functionality for combining multiple errors. **For new projects, we recommend using `errors.Join` from the standard library.** This package provides additional features like custom formatting, the `Group` pattern for concurrent error collection, and utility functions (`Append`, `Flatten`, `Prefix`).
+
+## Migrating to `errors.Join`
+
+**Basic error aggregation:**
+```go
+// Before (go-multierror)
+var result error
+result = multierror.Append(result, err1)
+result = multierror.Append(result, err2)
+return result
+
+// After (stdlib)
+var errs []error
+if err1 != nil {
+    errs = append(errs, err1)
+}
+if err2 != nil {
+    errs = append(errs, err2)
+}
+if len(errs) > 0 {
+    return errors.Join(errs...)
+}
+return nil
+```
+
+**Custom formatting:**
+```go
+// go-multierror allows custom formatting
+// With stdlib, wrap the joined error with a custom type if needed
+type FormattedError struct {
+    errs []error
+}
+
+func (e *FormattedError) Error() string {
+    // Your custom format here
+    return fmt.Sprintf("multiple errors: %v", e.errs)
+}
+
+func (e *FormattedError) Unwrap() []error {
+    return e.errs
+}
+```
+
+**Concurrent error collection (Group):**
+```go
+// golang.org/x/sync/errgroup returns only the first error:
+import "golang.org/x/sync/errgroup"
+
+g := new(errgroup.Group)
+g.Go(func() error { return task1() })
+g.Go(func() error { return task2() })
+err := g.Wait() // Returns first error only
+
+// To collect ALL errors like multierror.Group does, use a mutex:
+type ErrorCollector struct {
+    mu   sync.Mutex
+    errs []error
+}
+
+func (ec *ErrorCollector) Add(err error) {
+    if err != nil {
+        ec.mu.Lock()
+        ec.errs = append(ec.errs, err)
+        ec.mu.Unlock()
+    }
+}
+
+func (ec *ErrorCollector) Err() error {
+    ec.mu.Lock()
+    defer ec.mu.Unlock()
+    if len(ec.errs) == 0 {
+        return nil
+    }
+    return errors.Join(ec.errs...)
+}
+```
+
+---
+
 `go-multierror` is a package for Go that provides a mechanism for
 representing a list of `error` values as a single `error`.
 
@@ -15,10 +95,11 @@ be a list of errors. If the caller knows this, they can unwrap the
 list and access the errors. If the caller doesn't know, the error
 formats to a nice human-readable format.
 
-`go-multierror` is fully compatible with the Go standard library
-[errors](https://golang.org/pkg/errors/) package, including the
-functions `As`, `Is`, and `Unwrap`. This provides a standardized approach
-for introspecting on error values.
+`go-multierror` is compatible with the Go standard library
+[errors](https://golang.org/pkg/errors/) package, supporting the
+`As`, `Is`, and `Unwrap` functions for error introspection. Note that `Unwrap` 
+returns errors one at a time via chaining, unlike `errors.Join` which 
+implements the newer `Unwrap() []error` signature (Go 1.20+).
 
 ## Installation and Docs
 
