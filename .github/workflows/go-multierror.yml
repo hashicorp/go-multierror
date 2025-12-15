@@ -73,12 +73,12 @@ jobs:
         run: |-
           gotestsum --format=short-verbose --junitfile ${{ env.REPORT_FILE }} -- -p 2 -cover -coverprofile=coverage-linux.out ./...
       - name: Upload and save artifacts
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           path: ${{ env.TEST_RESULTS_PATH }}
           name: tests-linux-${{ matrix.go-version }}
       - name: Upload coverage report
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           path: coverage-linux.out
           name: Coverage-report-linux-${{matrix.go-version}}
@@ -120,12 +120,12 @@ jobs:
         run: |-
           gotestsum.exe --format=short-verbose --junitfile ${{ env.REPORT_FILE }} -- -p 2 -cover -coverprofile="coverage-win.out" ./...
       - name: Upload and save artifacts
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           path: ${{ env.TEST_RESULTS_PATH }}
           name: tests-windows-${{ matrix.go-version }}
       - name: Upload coverage test
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           path: coverage-win.out
           name: Coverage-report-win-${{matrix.go-version}}
