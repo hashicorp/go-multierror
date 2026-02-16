@@ -53,3 +53,10 @@ func TestSortMultiple(t *testing.T) {
 		t.Fatalf("bad: %#v", err)
 	}
 }
+
+func TestLenNil(t *testing.T) {
+	var err *Error
+	if err.Len() != 0 {
+		t.Fatalf("expected Len() to return 0 for nil *Error, got %d", err.Len())
+	}
+}
