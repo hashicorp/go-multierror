@@ -12,6 +12,9 @@ import (
 // turn the list of errors into a string.
 type ErrorFormatFunc func([]error) string
 
+// DefaultErrorFormatFunc is the default ErrorFormatFunc
+var DefaultErrorFormatFunc = ListFormatFunc
+
 // ListFormatFunc is a basic formatter that outputs the number of errors
 // that occurred along with a bullet point list of the errors.
 func ListFormatFunc(es []error) string {
