@@ -122,3 +122,12 @@ func (e chain) As(target interface{}) bool {
 func (e chain) Is(target error) bool {
 	return errors.Is(e[0], target)
 }
+
+func Unwrap(wraperr error) (chainErr error, err error) {
+	c, ok := errors.Unwrap(wraperr).(chain)
+	if !ok {
+		return nil, nil
+	}
+
+	return c, c[0]
+}
