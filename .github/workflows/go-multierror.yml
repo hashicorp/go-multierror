@@ -38,7 +38,7 @@ jobs:
           # go version file has the minimum supported version of go - 1.13
           go-version-file: go.mod
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@1e7e51e771db61008b38414a730f564565cf7c20
         with:
           version: v2.8.0
 
