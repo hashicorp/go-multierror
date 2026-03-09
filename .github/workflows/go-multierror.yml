@@ -37,7 +37,9 @@ jobs:
         with:
           go-version-file: go.mod
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@1e7e51e771db61008b38414a730f564565cf7c20
+        uses: golangci/golangci-lint-action@v4
+        with:
+          version: v1.59.0
 
   linux-tests:
     runs-on: ubuntu-latest
