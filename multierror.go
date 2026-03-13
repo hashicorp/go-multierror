@@ -10,6 +10,12 @@ import (
 
 // Error is an error type to track multiple errors. This is used to
 // accumulate errors in cases and return them as a single "error".
+//
+// Error is NOT safe for concurrent access from multiple goroutines.
+// If you need to collect errors from concurrent goroutines, use the
+// Group type, which provides a thread-safe interface for concurrent
+// error collection. Alternatively, you can protect access to an Error
+// value with a sync.Mutex.
 type Error struct {
 	Errors      []error
 	ErrorFormat ErrorFormatFunc
