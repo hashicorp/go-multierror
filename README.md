@@ -101,6 +101,44 @@ formats to a nice human-readable format.
 returns errors one at a time via chaining, unlike `errors.Join` which 
 implements the newer `Unwrap() []error` signature (Go 1.20+).
 
+## Thread Safety
+
+`multierror.Error` and the `Append` function are **not** safe for concurrent
+access from multiple goroutines. Calling `Append` or modifying the `Errors`
+slice from multiple goroutines without synchronization will result in a data
+race.
+
+For concurrent use cases, you have two options:
+
+**Option 1: Use `Group`** (recommended)
+
+The `Group` type handles synchronization internally and is safe to use from
+multiple goroutines:
+
+```go
+var g multierror.Group
+
+g.Go(func() error { return task1() })
+g.Go(func() error { return task2() })
+
+err := g.Wait()
+```
+
+**Option 2: Protect with a mutex**
+
+If you need more control, wrap `Append` calls with a `sync.Mutex`:
+
+```go
+var (
+    mu     sync.Mutex
+    result error
+)
+
+mu.Lock()
+result = multierror.Append(result, err)
+mu.Unlock()
+```
+
 ## Installation and Docs
 
 Install using `go get github.com/hashicorp/go-multierror`.
