@@ -45,3 +45,38 @@ func TestGroup(t *testing.T) {
 		}
 	}
 }
+
+func TestGroupWait_ErrorNil(t *testing.T) {
+	g := new(Group)
+	g.Go(func() error { return nil })
+	err := g.Wait()
+	if err != nil {
+		t.Fatalf("expected error to be nil, but was %v", err)
+	}
+}
+
+func TestGroupWait_ErrorNotNil(t *testing.T) {
+	g := new(Group)
+	msg := "test error"
+	g.Go(func() error { return errors.New(msg) })
+	err := g.Wait()
+	if err == nil {
+		t.Fatalf("expected error to be nil, but was %v", err)
+	}
+
+	// err is a *Error, and e is set to the error's value
+	var e *Error
+	if !errors.As(err, &e) {
+		t.Fatalf("expected err to be type *Error, but was type %T, value %v", err, err)
+	}
+
+	errs := e.WrappedErrors()
+	if len(errs) != 1 {
+		t.Fatalf("expected one wrapped error, but found %d", len(errs))
+	}
+
+	wrapped := errs[0]
+	if wrapped.Error() != "test error" {
+		t.Fatalf("expected wrap error message to be '%s', but was '%s'", msg, wrapped.Error())
+	}
+}
