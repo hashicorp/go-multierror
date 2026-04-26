@@ -4,6 +4,7 @@
 package multierror
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"reflect"
@@ -203,6 +204,53 @@ func TestErrorAs(t *testing.T) {
 			t.Fatal("target should be nil")
 		}
 	})
+}
+
+func TestPackageUnwrap(t *testing.T) {
+	t.Run("with reference checking", func(t *testing.T) {
+		err := &Error{Errors: []error{
+			errors.New("foo"),
+			errors.New("bar"),
+			errors.New("baz"),
+		}}
+
+		var currentChain error = err
+		var errorRef error
+
+		for i := 0; i < len(err.Errors); i++ {
+			currentChain, errorRef = Unwrap(currentChain)
+
+			if errorRef != err.Errors[i] {
+				t.Fatal("invalid be equal")
+			}
+		}
+
+		if chain, err := Unwrap(currentChain); chain != nil || err != nil {
+			t.Fatal("should be nil at the end")
+		}
+	})
+
+	t.Run("with switch cases", func(t *testing.T) {
+		UserNotExistsErr := errors.New("user not exists")
+
+		fakeAddUser := func() error {
+			return Append(UserNotExistsErr, sql.ErrNoRows)
+		}
+
+		err := fakeAddUser()
+
+		switch chainErr, err := Unwrap(err); err {
+		case UserNotExistsErr:
+			switch _, err := Unwrap(chainErr); err {
+			case sql.ErrNoRows:
+			default:
+				t.Errorf("should be sql.ErrNoRows")
+			}
+		default:
+			t.Errorf("should be UserNotExistsErr err")
+		}
+	})
+
 }
 
 // nestedError implements error and is used for tests.
