@@ -37,3 +37,21 @@ func TestPrefix_NonError(t *testing.T) {
 		t.Fatalf("bad: %s", result)
 	}
 }
+
+func TestPrefix_ErrorsIs(t *testing.T) {
+	// errors.Is should work through errors returned by Prefix.
+	sentinel := errors.New("sentinel")
+
+	// Non-multierror case
+	result := Prefix(sentinel, "context:")
+	if !errors.Is(result, sentinel) {
+		t.Fatalf("errors.Is should find sentinel through Prefix result, got %s", result)
+	}
+
+	// multierror case
+	multi := &Error{Errors: []error{sentinel}}
+	prefixed := Prefix(multi, "context:")
+	if !errors.Is(prefixed, sentinel) {
+		t.Fatalf("errors.Is should find sentinel through Prefix multierror result, got %s", prefixed)
+	}
+}
