@@ -27,11 +27,11 @@ func Prefix(err error, prefix string) error {
 
 		// Wrap each of the errors
 		for i, e := range err.Errors {
-			err.Errors[i] = fmt.Errorf("%s %s", prefix, e)
+			err.Errors[i] = fmt.Errorf("%s %w", prefix, e)
 		}
 
 		return err
 	default:
-		return fmt.Errorf("%s %s", prefix, err)
+		return fmt.Errorf("%s %w", prefix, err)
 	}
 }
