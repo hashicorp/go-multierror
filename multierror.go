@@ -49,7 +49,7 @@ func (e *Error) GoString() string {
 //
 // This method is not safe to be called concurrently. Unlike accessing the
 // Errors field directly, this function also checks if the multierror is nil to
-// prevent a null-pointer panic. It satisfies the errwrap.Wrapper interface.
+// prevent a nil pointer panic. It satisfies the errwrap.Wrapper interface.
 func (e *Error) WrappedErrors() []error {
 	if e == nil {
 		return nil

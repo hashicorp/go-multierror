@@ -7,7 +7,7 @@ package multierror
 // onto an Error in order to create a larger multi-error.
 //
 // If err is not a multierror.Error, then it will be turned into
-// one. If any of the errs are multierr.Error, they will be flattened
+// one. If any of the errs are multierror.Error, they will be flattened
 // one level into err.
 // Any nil errors within errs will be ignored. If err is nil, a new
 // *Error will be returned.
