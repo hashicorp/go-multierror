@@ -49,6 +49,11 @@ func TestErrorError_default(t *testing.T) {
 }
 
 func TestErrorErrorOrNil(t *testing.T) {
+	var nilErr *Error
+	if nilErr.ErrorOrNil() != nil {
+		t.Fatalf("bad: %#v", nilErr.ErrorOrNil())
+	}
+
 	err := new(Error)
 	if err.ErrorOrNil() != nil {
 		t.Fatalf("bad: %#v", err.ErrorOrNil())
@@ -59,6 +64,16 @@ func TestErrorErrorOrNil(t *testing.T) {
 		t.Fatal("should not be nil")
 	} else if !reflect.DeepEqual(v, err) {
 		t.Fatalf("bad: %#v", v)
+	}
+}
+
+func TestErrorGoString(t *testing.T) {
+	err := &Error{
+		Errors: []error{errors.New("foo")},
+	}
+	expected := fmt.Sprintf("*%#v", *err)
+	if err.GoString() != expected {
+		t.Fatalf("expected %q, got %q", expected, err.GoString())
 	}
 }
 
