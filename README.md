@@ -229,3 +229,31 @@ var result *multierror.Error
 // return nil since there are no errors.
 return result.ErrorOrNil()
 ```
+
+**Concurrent error collection with context cancellation**
+
+The `Group` type collects errors from goroutines. With `WithContext` the group
+cancels a derived context as soon as the first goroutine returns an error (or
+when `Wait` returns), so the remaining goroutines can stop early — while all
+errors produced up to that point are still aggregated:
+
+```go
+g, ctx := multierror.WithContext(parentCtx)
+
+g.Go(func() error {
+	// Stop as soon as another goroutine fails or the parent context is
+	// canceled.
+	select {
+	case <-ctx.Done():
+		return nil
+	default:
+	}
+	return doWork(ctx)
+})
+
+g.Go(func() error { return doOtherWork(ctx) })
+
+if err := g.Wait(); err != nil {
+	// All errors returned by the goroutines, not just the first one.
+}
+```
