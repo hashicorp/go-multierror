@@ -3,7 +3,10 @@
 
 package multierror
 
-import "sync"
+import (
+	"fmt"
+	"sync"
+)
 
 // Group is a collection of goroutines which return errors that need to be
 // coalesced.
@@ -22,6 +25,33 @@ func (g *Group) Go(f func() error) {
 
 	go func() {
 		defer g.wg.Done()
+
+		if err := f(); err != nil {
+			g.mutex.Lock()
+			g.err = Append(g.err, err)
+			g.mutex.Unlock()
+		}
+	}()
+}
+
+// GoWithRecover calls the given function in a new goroutine, recovering from any panic
+// and converting it into an error added to the group multierror.
+func (g *Group) GoWithRecover(f func() error) {
+	g.wg.Add(1)
+
+	go func() {
+		defer g.wg.Done()
+		defer func() {
+			if r := recover(); r != nil {
+				g.mutex.Lock()
+				if err, ok := r.(error); ok {
+					g.err = Append(g.err, fmt.Errorf("panic: %w", err))
+				} else {
+					g.err = Append(g.err, fmt.Errorf("panic: %v", r))
+				}
+				g.mutex.Unlock()
+			}
+		}()
 
 		if err := f(); err != nil {
 			g.mutex.Lock()
