@@ -229,3 +229,39 @@ var result *multierror.Error
 // return nil since there are no errors.
 return result.ErrorOrNil()
 ```
+
+**Concurrent error collection with Group**
+
+`Group` runs goroutines concurrently and aggregates their errors:
+
+```go
+var g multierror.Group
+
+g.Go(func() error {
+	return step1()
+})
+g.Go(func() error {
+	return step2()
+})
+
+if err := g.Wait(); err != nil {
+	return err
+}
+```
+
+To cancel goroutines upon the first error while still collecting all errors, use `GroupWithContext`:
+
+```go
+g, ctx := multierror.GroupWithContext(ctx)
+
+g.Go(func() error {
+	return step1(ctx)
+})
+g.Go(func() error {
+	return step2(ctx)
+})
+
+if err := g.Wait(); err != nil {
+	return err
+}
+```
