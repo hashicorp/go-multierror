@@ -40,6 +40,18 @@ func TestFlatten(t *testing.T) {
 	}
 }
 
+func TestFlattenTypedNil(t *testing.T) {
+	var result *Error
+	if got := Flatten(result); got != nil {
+		t.Fatalf("Flatten(typed nil) = %#v, want nil", got)
+	}
+
+	flat := Flatten(&Error{Errors: []error{errors.New("one"), (*Error)(nil)}}).(*Error)
+	if len(flat.Errors) != 1 || flat.Errors[0].Error() != "one" {
+		t.Fatalf("got %#v", flat.Errors)
+	}
+}
+
 func TestFlatten_nonError(t *testing.T) {
 	err := errors.New("foo")
 	actual := Flatten(err)
