@@ -11,6 +11,10 @@ package multierror
 // one level into err.
 // Any nil errors within errs will be ignored. If err is nil, a new
 // *Error will be returned.
+//
+// This function is NOT safe to be called concurrently. To collect
+// errors from goroutines, use Group or protect calls to Append with
+// a sync.Mutex.
 func Append(err error, errs ...error) *Error {
 	switch err := err.(type) {
 	case *Error:
