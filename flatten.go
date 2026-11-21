@@ -6,8 +6,12 @@ package multierror
 // Flatten flattens the given error, merging any *Errors together into
 // a single *Error.
 func Flatten(err error) error {
-	// If it isn't an *Error, just return the error as-is
-	if _, ok := err.(*Error); !ok {
+	// A typed nil *Error satisfies the interface but carries no error.
+	if e, ok := err.(*Error); ok {
+		if e == nil {
+			return nil
+		}
+	} else {
 		return err
 	}
 
@@ -20,6 +24,9 @@ func Flatten(err error) error {
 func flatten(err error, flatErr *Error) {
 	switch err := err.(type) {
 	case *Error:
+		if err == nil {
+			return
+		}
 		for _, e := range err.Errors {
 			flatten(e, flatErr)
 		}
